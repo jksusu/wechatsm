@@ -26,38 +26,43 @@ class UploadPicture
         $this->apiCertificateNumber = $apiCertificateNumber;
         $this->mchId = $mchId;
         $this->boundary = uniqid();
-        $this->genSign()->setHeader()->setBody();
     }
 
     public function uploadImage(string $picturePath)
     {
-        return $this->params = [
+        $this->params = [
+            'filePath' => $picturePath,
             'filename' => basename($picturePath),
             'sha256' => hash_file('sha256', $picturePath),
         ];
 
+        $this->genSign()->setHeader()->setBody();
+
         return $this->curl();
     }
 
-
     private function curl()
     {
-        $ch = curl_init($this->uploadAPi);
-        curl_setopt_array($ch, [
-            'CURLOPT_HTTPHEADER' => $this->header,
-            'CURLOPT_POSTFIELDS' => $this->body,
-            'CURLOPT_TIMEOUT' => 30,
-        ]);
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $this->uploadAPi);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, $this->header);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
+        curl_setopt($ch, CURLOPT_SSLVERSION, false);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
+        curl_setopt($ch, CURLOPT_POST, true);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $this->body);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_TIMEOUT, 30);
         $response = curl_exec($ch);
-
         if ($error = curl_error($ch)) {
             throw new HttpException($error);
         }
         curl_close($ch);
         $res = json_decode($response, true);
-        if (isset($res['media_id'])) {
-            return $res['media_id'];
+        if (!isset($res['media_id'])) {
+            throw new HttpException($res);
         }
-        throw new HttpException($res);
+        return $res['media_id'];
     }
 }

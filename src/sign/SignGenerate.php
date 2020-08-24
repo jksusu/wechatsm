@@ -44,6 +44,7 @@ trait SignGenerate
     private function setHeader()
     {
         $this->header = [
+            'User-Agent' => 'User-Agent:Mozilla/5.0 (Windows NT 10.0; Win64; x64)',
             'Authorization: WECHATPAY2-SHA256-RSA2048 ' . $this->sign,
             'Content-Type: multipart/form-data;boundary=' . $this->boundary
         ];
