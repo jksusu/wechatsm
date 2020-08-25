@@ -4,6 +4,7 @@ declare (strict_types=1);
 namespace Wechatsm\Upload;
 
 use Wechatsm\Exceptions\HttpException;
+use Wechatsm\Exceptions\InvalidArgumentException;
 
 class UploadPicture
 {
@@ -18,11 +19,19 @@ class UploadPicture
 
     private $params;
 
+    protected $extension = [
+        'jpg' => 'jpg',
+        'JPG' => 'JPG',
+        'bmp' => 'bmp',
+        'BMP' => 'BMP',
+        'png' => 'png',
+        'PNG' => 'PNG',
+    ];
 
     public function __construct($privateKey, string $mchId, string $apiCertificateNumber)
     {
         $this->timeStamp = time();
-        $this->privateKey = openssl_get_privatekey(file_get_contents($privateKey));
+        $this->privateKey = $privateKey;
         $this->apiCertificateNumber = $apiCertificateNumber;
         $this->mchId = $mchId;
         $this->boundary = uniqid();
@@ -30,14 +39,21 @@ class UploadPicture
 
     public function uploadImage(string $picturePath)
     {
+        if (!file_exists($this->privateKey)) {
+            throw new InvalidArgumentException($this->privateKey . ' file not exists !!!');
+        }
+        $this->privateKey = openssl_get_privatekey(file_get_contents($this->privateKey));
+
+        $extension = pathinfo($picturePath)['extension'];
+        if (!array_key_exists($extension, $this->extension)) {
+            throw new InvalidArgumentException('suffix support jpg bmp png !!!');
+        }
         $this->params = [
             'filePath' => $picturePath,
             'filename' => basename($picturePath),
             'sha256' => hash_file('sha256', $picturePath),
         ];
-
         $this->genSign()->setHeader()->setBody();
-
         return $this->curl();
     }
 
