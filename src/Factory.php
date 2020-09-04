@@ -12,7 +12,8 @@ namespace Wechatsm;
 /**
  * Class Factory.
  *
- * @method static \Wechatsm\Apply\Application      apply(array $config)
+ * @method static \Wechatsm\Apply\Application       apply(array $config)
+ * @method static \Wechatsm\Upload\Application      upload(array $config)
  */
 class Factory
 {
