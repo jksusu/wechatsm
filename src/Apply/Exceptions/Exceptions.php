@@ -7,9 +7,9 @@ declare (strict_types=1);
  * @license  https://github.com/jksusu/wechatsm/blob/master/LICENSE
  */
 
-namespace Wechatsm\Apply\MerchantsApply;
+namespace Wechatsm\Apply\Exceptions;
 
-
-class QueryAccount
+class Exceptions extends \Exception
 {
+
 }

@@ -1,10 +1,7 @@
 <?php
 declare (strict_types=1);
 
-namespace Wechatsm\Upload;
-
-use Wechatsm\Exceptions\HttpException;
-use Wechatsm\Exceptions\InvalidArgumentException;
+namespace Wechatsm\Apply\MerchantsApply;
 
 class UploadPicture
 {
